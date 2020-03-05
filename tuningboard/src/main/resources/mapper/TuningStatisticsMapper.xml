@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ 
+<mapper namespace="com.tuningboard.mapper.TuningStatisticsMapper">
+ 
+    <select id="getTuningStatistics" resultType="com.tuningboard.domain.TuningStatisticsDTO">
+        <![CDATA[SELECT	COALESCE(a.type, 'Total') AS 'type', 
+		 COUNT(a.svcid) AS 'svc_Count', 
+		 SUM((CASE WHEN (c.status IS NOT NULL) THEN 1 ELSE 0 END)) AS 'TOTAL', 
+		 SUM((CASE WHEN (c.status = 'OPEN') THEN 1   ELSE 0  END)) AS 'OPEN', 
+		 SUM((CASE WHEN (c.status = 'UNDER_GUIDE') THEN 1  ELSE 0 END)) AS 'UNDER_GUIDE', 
+		 SUM((CASE WHEN (c.status = 'IN_PROGRESS') THEN 1   ELSE 0  END)) AS 'IN_PROGRESS', 
+		 SUM((CASE WHEN (c.status = 'FIXED') THEN 1 ELSE 0  END)) AS 'FIXED', 
+		 SUM((CASE WHEN (c.status = 'REOPEN') THEN 1 ELSE 0 END)) AS 'REOPEN', 
+		 SUM((CASE WHEN (c.status = 'CLOSED') THEN 1 ELSE 0 END)) AS 'CLOSED', 
+		 SUM((CASE WHEN (c.status = 'CLOSED1') THEN 1 ELSE 0 END)) AS 'CLOSED1', 
+		 SUM((CASE WHEN ((c.status = 'CLOSED') OR (c.status = 'CLOSED1')) THEN 1 ELSE 0 END)) AS 'TOTAL_CLOSED', 
+		 ROUND(((SUM((CASE WHEN ((c.status = 'CLOSED') OR (c.status = 'CLOSED1')) THEN 1 ELSE 0 END)) / COUNT(0)) * 100),0) AS 'RATIO', 
+		 SUM((CASE WHEN (c.deftype IS NOT NULL) THEN 1 ELSE 0 END)) AS 'TOTAL_DEFECT', 
+		 SUM((CASE WHEN (c.deftype = 'APP') THEN 1 ELSE 0 END)) AS 'APP', 
+		 SUM((CASE WHEN (c.deftype = 'SQL') THEN 1 ELSE 0 END)) AS 'SQL', 
+		 SUM((CASE WHEN (c.deftype = 'APPSQL') THEN 1 ELSE 0 END)) AS 'APPSQL', 
+		 SUM((CASE WHEN (c.deftype = 'TMF') THEN 1 ELSE 0 END)) AS 'TMF', 
+		 SUM((CASE WHEN (c.deftype = 'IF') THEN 1 ELSE 0 END)) AS 'I_F' 
+			FROM svcinfo a INNER JOIN tuninfo c ON a.id = c.svcinfo_id 
+			 WHERE c.tuntype = 'Y' 
+			GROUP BY a.type WITH ROLLUP 
+			ORDER BY a.type DESC
+		]]>
+    </select> 
+</mapper>

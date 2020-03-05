@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>성능튜닝게시판</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+
+	<style>
+                #topMenu {
+                        height: 30px;
+                        width: 1500px;
+                }
+
+                #topMenu ul li {
+                        list-style: none;
+                        color: white;
+                        background-color: #2d2d2d;
+                        float: left;
+                        line-height: 30px;
+                        vertical-align: middle;
+                        text-align: center;
+                }
+
+                #topMenu .menuLink {
+                        text-decoration:none;
+                        color: white;
+                        display: block;
+                        width: 150px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        font-family: "Trebuchet MS";
+                }
+                #topMenu .menuLink:hover {
+                        color: red;
+                        background-color: #4d4d4d;
+                }
+
+    </style>    
+</head>
+<body>
+
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <!--header-->
+    <nav class="navbar navbar-default navbar-fixed-top" >
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div id="topMenu" >
+             <ul> 
+             	<li><a class="menuLink" href="/svcinfo/list">서비스 현황</a></li> 
+             	<li><a class="menuLink" href="/tuninfo/list">서비스 튜닝 현황</a></li> 
+             	<li><a class="menuLink" href="/report/svcstat">서비스 현황 통계</a></li>
+             	<li><a class="menuLink" href="/report/tunstat">서비스 튜닝 통계</a></li> 
+             </ul>
+	        <ul class="pull-right" style="width:100px;margin:1px 0;">
+            	<li><a href="/logout" class="btn btn-primary btn-block">로그아웃</a></li>
+    	    </ul>     
+         	</div>
+         </div>
+    </nav>
+    <!--/header-->
+
+<body>
+    <!--body-->
+    <div class="container">
+        <br/>
+        <div class="page-header">
+              <h2>서비스 등록</h2>
+        </div>
+		<input id="svcinfo_id" type="hidden" th:value="${svcinfo?.id}"/>
+        
+        <table class="table">
+             <tr>
+                <th style="padding:13px 0 0 15px">업무유형 선택</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="svcinfo_type">
+                            <option>--유형--</option>
+                            <option th:value="KSIOP" th:selected="${svcinfo.type?.name() == 'KSIOP'}">KSIOP</option>
+                            <option th:value="WS" th:selected="${svcinfo.type?.name() == 'WS'}">WS</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">서비스ID</th>
+                <td><input id="svcinfo_svcId" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.svcId}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">서비스명</th>
+                <td><input id="svcinfo_svcName" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.svcName}"/></td>
+            </tr>
+             <tr>
+                <th style="padding:13px 0 0 15px;">업무구분</th>
+                <td><input id="svcinfo_bizType" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.bizType}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">업무상세</th>
+                <td><input id="svcinfo_bizDetail" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.bizDetail}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">화면ID</th>
+                <td><input id="svcinfo_scnId" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.scnId}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">화면명</th>
+                <td><input id="svcinfo_scnName" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.scnName}"/></td>
+            </tr>
+             <tr>
+                <th style="padding:13px 0 0 15px">우선순위</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="svcinfo_priority">
+                            <option>--유형--</option>
+                            <option th:value="MCP" th:selected="${svcinfo.priority?.name() == 'MCP'}">MCP</option>
+                            <option th:value="CP" th:selected="${svcinfo.priority?.name() == 'CP'}">CP</option>
+                            <option th:value="기타" th:selected="${svcinfo.priority?.name() == '기타'}">기타</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>            
+            <tr>
+                <th style="padding:13px 0 0 15px;">수행사리더</th>
+                <td><input id="svcinfo_leader" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.leader}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">개발자</th>
+                <td><input id="svcinfo_developer" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.developer}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">설계자</th>
+                <td><input id="svcinfo_designer" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.designer}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">업무리더</th>
+                <td><input id="svcinfo_customer" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.customer}"/></td>
+            </tr>
+             <tr>
+                <th style="padding:13px 0 0 15px">성능테스트대상</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="svcinfo_perfTest">
+                            <option>--유형--</option>
+                            <option th:value="Y" th:selected="${svcinfo.perfTest?.name() == 'Y'}">Y</option>
+                            <option th:value="N" th:selected="${svcinfo.perfTest?.name() == 'N'}">N</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">기능명</th>
+                <td><input id="svcinfo_funName" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.funName}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">세부기능명</th>
+                <td><input id="svcinfo_subFunName" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.subFunName}"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">생성일짜</th>
+                <td><input id="svcinfo_createdDate" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.createdDate}" readonly="readonly"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">수정일자</th>
+                <td><input id="svcinfo_updatedDate" type="text" class="col-lg-1 form-control input-sm" th:value="${svcinfo?.updatedDate}" readonly="readonly"/></td>
+            </tr>
+            <tr>
+            <td/>
+            <td/>
+            </tr>
+        </table>
+        <div class="pull-left">
+            <a href="/svcinfo/list" class="btn btn-default">목록으로</a>
+        </div>
+        <div class="pull-right">
+            <button th:if="!${svcinfo?.id}" type="button" class="btn btn-primary" id="insert">저장</button>
+            <button th:if="${svcinfo?.id}" type="button" class="btn btn-info" id="update">수정</button>
+            <button th:if="${svcinfo?.id}" type="button" class="btn btn-danger" id="delete">삭제</button>
+        </div>
+    </div>
+    <!--/body-->
+
+<!--     <script th:src="@{/js/jquery.min.js}"></script> -->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script th:if="!${svcinfo?.id}">
+    $('#insert').click(function() {
+    	var jsonData = JSON.stringify({
+    		svcId : $('#svcinfo_svcId').val(),
+    		svcName : $('#svcinfo_svcName').val(),
+     		type : $('#svcinfo_type').val(),
+    		bizType : $('#svcinfo_bizType').val(),
+    		bizDetail : $('#svcinfo_bizDetail').val(),
+    		scnId : $('#svcinfo_scnId').val(),
+    		scnName : $('#svcinfo_scnName').val(),
+    		priority : $('#svcinfo_priority').val(),
+    		leader : $('#svcinfo_leader').val(),
+    		developer : $('#svcinfo_developer').val(),
+    		designer : $('#svcinfo_designer').val(),
+    		customer : $('#svcinfo_customer').val(),
+    		perfTest : $('#svcinfo_perfTest').val(),
+    		funName : $('#svcinfo_funName').val(),
+    		subFunName : $('#svcinfo_subFunName').val(),
+    	});
+    	$.ajax({
+    		url: "http://localhost:8080/api/svcinfos",
+    		type: "POST",
+    		data: jsonData,
+    		contentType: "application/json",
+    		dataType: "json",
+    		success:function() {
+    			alert('저장 성공!');
+    			location.href = '/svcinfo/list';
+    		},
+    		error: function() {
+    			alert('저장 실패!');
+    		}
+    	});
+    }); 
+    </script>
+    <script th:if="${svcinfo?.id}">
+    $('#update').click(function() {
+    	var jsonData = JSON.stringify({
+    		svcId : $('#svcinfo_svcId').val(),
+    		svcName : $('#svcinfo_svcName').val(),
+     		type : $('#svcinfo_type').val(),
+    		bizType : $('#svcinfo_bizType').val(),
+    		bizDetail : $('#svcinfo_bizDetail').val(),
+    		scnId : $('#svcinfo_scnId').val(),
+    		scnName : $('#svcinfo_scnName').val(),
+    		priority : $('#svcinfo_priority').val(),
+    		leader : $('#svcinfo_leader').val(),
+    		developer : $('#svcinfo_developer').val(),
+    		designer : $('#svcinfo_designer').val(),
+    		customer : $('#svcinfo_customer').val(),
+    		perfTest : $('#svcinfo_perfTest').val(),
+    		funName : $('#svcinfo_funName').val(),
+    		subFunName : $('#svcinfo_subFunName').val(),
+    	});
+    	$.ajax({
+    		url: "http://localhost:8080/api/svcinfos/" + $('#svcinfo_id').val(),
+    		type: "PUT",
+    		data: jsonData,
+    		contentType: "application/json",
+    		dataType: "json",
+    		success:function() {
+    			alert('수정 성공!');
+    			location.href = '/svcinfo/list';
+    		},
+    		error: function() {
+    			alert('수정 실패!');
+    		}
+    	});
+    });
+    $('#delete').click(function() {
+    	$.ajax({
+    		url: "http://localhost:8080/api/svcinfos/" + $('#svcinfo_id').val(),
+    		type: "DELETE",
+    		success:function() {
+    			alert('삭제 성공!');
+    			location.href = '/svcinfo/list';
+    		},
+    		error: function() {
+    			alert('삭제 실패!');
+    		}
+    	});
+    });
+    </script>
+
+	<!-- Footer HTML 로드 시작-->
+	<footer th:fragment="/common/footer.html"></footer>
+	<!-- Footer HTML 로드 종료-->
+		
+</body>
+</html>

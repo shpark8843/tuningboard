@@ -1,0 +1,6 @@
+com.tuningboard
+com.tuningboard.controller
+com.tuningboard.domain
+com.tuningboard.mapper
+com.tuningboard.repository
+com.tuningboard.service

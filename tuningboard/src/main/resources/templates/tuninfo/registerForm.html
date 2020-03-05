@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>성능튜닝게시판</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+
+	<style>
+                #topMenu {
+                        height: 30px;
+                        width: 1500px;
+                }
+
+                #topMenu ul li {
+                        list-style: none;
+                        color: white;
+                        background-color: #2d2d2d;
+                        float: left;
+                        line-height: 30px;
+                        vertical-align: middle;
+                        text-align: center;
+                }
+
+                #topMenu .menuLink {
+                        text-decoration:none;
+                        color: white;
+                        display: block;
+                        width: 150px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        font-family: "Trebuchet MS";
+                }
+                #topMenu .menuLink:hover {
+                        color: red;
+                        background-color: #4d4d4d;
+                }
+
+    </style>    
+</head>
+<body>
+
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <!--header-->
+    <nav class="navbar navbar-default navbar-fixed-top" >
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div id="topMenu" >
+             <ul> 
+             	<li><a class="menuLink" href="/svcinfo/list">서비스 현황</a></li> 
+             	<li><a class="menuLink" href="/tuninfo/list">서비스 튜닝 현황</a></li> 
+             	<li><a class="menuLink" href="/report/svcstat">서비스 현황 통계</a></li>
+             	<li><a class="menuLink" href="/report/tunstat">서비스 튜닝 통계</a></li> 
+             </ul>
+	        <ul class="pull-right" style="width:100px;margin:1px 0;">
+            	<li><a href="/logout" class="btn btn-primary btn-block">로그아웃</a></li>
+    	    </ul>     
+         	</div>
+         </div>
+    </nav>
+    <!--/header-->
+
+<body>
+    <!--body-->
+    <div class="container">
+        <br/>
+        <div class="page-header">
+              <h2>서비스 튜닝현황 등록/수정</h2>
+        </div>
+        
+        <div class="pull-right" style="width:100px;margin:0px 0;">
+            <a href="/tuninfo" class="btn btn-primary btn-block">신규추가</a>
+        </div>
+        <br/>    
+                
+		<input id="tuninfo_id" type="hidden" th:value="${tuninfo?.id}"/>
+       
+        <table class="table">
+             <tr>
+                <th style="padding:13px 0 0 15px">개선대상여부</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="tuninfo_tunType">
+                            <option>--유형--</option>
+                            <option th:value="Y" th:selected="${tuninfo.tunType?.name() == 'Y'}">Y</option>
+                            <option th:value="N" th:selected="${tuninfo.tunType?.name() == 'N'}">N</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px">결함유형</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="tuninfo_defType">
+                            <option>--유형--</option>
+                            <option th:value="APP" th:selected="${tuninfo.defType?.name() == 'APP'}">APP</option>
+                            <option th:value="SQL" th:selected="${tuninfo.defType?.name() == 'SQL'}">SQL</option>
+                            <option th:value="APPSQL" th:selected="${tuninfo.defType?.name() == 'APPSQL'}">APPSQL</option>
+                            <option th:value="TMF" th:selected="${tuninfo.defType?.name() == 'TMF'}">TMF</option>
+                            <option th:value="SSO" th:selected="${tuninfo.defType?.name() == 'SSO'}">SSO</option>
+                            <option th:value="IF" th:selected="${tuninfo.defType?.name() == 'IF'}">IF</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px">테스트유형</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="tuninfo_testType">
+                            <option>--유형--</option>
+                            <option th:value="UT" th:selected="${tuninfo.testType?.name() == 'UT'}">UT</option>
+                            <option th:value="SIT" th:selected="${tuninfo.testType?.name() == 'SIT'}">SIT</option>
+                            <option th:value="UAT" th:selected="${tuninfo.testType?.name() == 'UAT'}">UAT</option>
+                            <option th:value="REHEARSAL" th:selected="${tuninfo.testType?.name() == 'REHEARSAL'}">REHEARSAL</option>
+                            <option th:value="PT" th:selected="${tuninfo.testType?.name() == 'PT'}">PT</option>
+                            <option th:value="OPERATION" th:selected="${tuninfo.testType?.name() == 'OPERATION'}">OPERATION</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">검토자</th>
+                <td><input id="tuninfo_reviewer" type="text" class="col-lg-1 form-control input-sm" th:value="${tuninfo?.reviewer}" readonly="readonly"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">검토의견</th>
+                <td><textarea id="tuninfo_description" class="col-lg-1 form-control input-sm" maxlength="100" rows="5" style="height: 100px;"
+                th:text="${tuninfo?.description}"></textarea><span class="help-block"></span>
+                </td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">검토일자</th>
+                <td><input id="tuninfo_reviewedDate" type="text" class="col-lg-1 form-control input-sm" th:value="${tuninfo?.reviewedDate}" readonly="readonly"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">튜너</th>
+                <td><input id="tuninfo_tuner" type="text" class="col-lg-1 form-control input-sm" th:value="${tuninfo?.tuner}" readonly="readonly"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px">가이드제공여부</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="tuninfo_submitType">
+                            <option>--유형--</option>
+                            <option th:value="Y" th:selected="${tuninfo.submitType?.name() == 'Y'}">Y</option>
+                            <option th:value="N" th:selected="${tuninfo.submitType?.name() == 'N'}">N</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">가이드제공일자</th>
+                <td><input id="tuninfo_submittedDate" type="text" class="col-lg-1 form-control input-sm" th:value="${tuninfo?.submittedDate}" readonly="readonly"/></td>
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">개발자</th>
+                <td><input id="tuninfo_responsible" type="text" class="col-lg-1 form-control input-sm" th:value="${tuninfo?.responsible}"/></td>
+            </tr>
+             <tr>
+                <th style="padding:13px 0 0 15px">가이드반영여부</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="tuninfo_updateType">
+                            <option>--유형--</option>
+                            <option th:value="Y" th:selected="${tuninfo.updateType?.name() == 'Y'}">Y</option>
+                            <option th:value="N" th:selected="${tuninfo.updateType?.name() == 'N'}">N</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">가이드반영일자</th>
+                <td><input id="tuninfo_updatedDate" type="text" class="col-lg-1 form-control input-sm" th:value="${tuninfo?.updatedDate}" readonly="readonly"/></td>
+            </tr>
+             <tr>
+                <th style="padding:13px 0 0 15px">완료여부</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="tuninfo_closeType">
+                            <option th:value="Y" th:selected="${tuninfo.closeType?.name() == 'Y'}">Y</option>
+                            <option th:value="N" th:selected="${tuninfo.closeType?.name() == 'N'}">N</option>
+                            <option th:value="조건부" th:selected="${tuninfo.closeType?.name() == '조건부'}">조건부</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">완료일자</th>
+                <td><input id="tuninfo_closedDate" type="text" class="col-lg-1 form-control input-sm" th:value="${tuninfo?.closedDate}" readonly="readonly"/></td>
+            </tr>
+             <tr>
+                <th style="padding:13px 0 0 15px">결함상태</th>
+                <td>
+                    <div class="pull-left">
+                        <select class="form-control input-sm" id="tuninfo_status">
+                            <option th:value="NEW" th:selected="${tuninfo.status?.name() == 'NEW'}">NEW</option>
+                            <option th:value="OPEN" th:selected="${tuninfo.status?.name() == 'OPEN'}">OPEN</option>
+                            <option th:value="UNDER_GUIDE" th:selected="${tuninfo.status?.name() == 'UNDER_GUIDE'}">UNDER_GUIDE</option>
+                            <option th:value="IN_PROGRESS" th:selected="${tuninfo.status?.name() == 'IN_PROGRESS'}">IN_PROGRESS</option>
+                            <option th:value="FIXED" th:selected="${tuninfo.status?.name() == 'FIXED'}">FIXED</option>
+                            <option th:value="CLOSED" th:selected="${tuninfo.status?.name() == 'CLOSED'}">CLOSED</option>
+                            <option th:value="CLOSED1" th:selected="${tuninfo.status?.name() == 'CLOSED1'}">CLOSED1</option>
+                            <option th:value="REOPEN" th:selected="${tuninfo.status?.name() == 'REOPEN'}">REOPEN</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+             <tr>
+                <th style="padding:13px 0 0 15px">조건부완료유형</th>
+                <td>
+                    <div class="pull-left">
+                        <select th:if="${tuninfo.status?.name() == 'CLOSED1'}"  class="form-control input-sm" id="tuninfo_detailType">
+                            <option>--유형--</option>
+                            <option th:value="DATA_SKEW" th:selected="${tuninfo.detailType?.name() == 'DATA_SKEW'}">DATA_SKEW</option>
+                            <option th:value="IO지연" th:selected="${tuninfo.detailType?.name() == 'IO지연'}">IO지연</option>
+                            <option th:value="REORG" th:selected="${tuninfo.detailType?.name() == 'REORG'}">REORG</option>
+                            <option th:value="TMF" th:selected="${tuninfo.detailType?.name() == 'TMF'}">TMF</option>
+                            <option th:value="개선불능" th:selected="${tuninfo.detailType?.name() == '개선불능'}">개선불능</option>
+                            <option th:value="락대기" th:selected="${tuninfo.detailType?.name() == '락대기'}">락대기</option>
+                        </select>
+                    </div>
+                </td> 
+            </tr>
+            <tr>
+                <th style="padding:13px 0 0 15px;">비고</th>
+                <td><textarea id="tuninfo_comment" class="col-lg-1 form-control input-sm" maxlength="100" rows="5" style="height: 200px;"
+                th:text="${tuninfo?.comment}"></textarea><span class="help-block"></span>
+                </td>
+            </tr>
+            <tr>
+            <td/>
+            <td/>
+            </tr>
+        </table>
+
+	    <p><a href="/svcinfo/list" class="btn btn-default">목록으로</a></p>
+	    
+        <div class="pull-right">
+            <button th:if="!${tuninfo?.id}" type="button" class="btn btn-primary" id="insert">저장</button>
+            <button th:if="${tuninfo?.id}" type="button" class="btn btn-info" id="update">수정</button>
+            <button th:if="${tuninfo?.id}" type="button" class="btn btn-danger" id="delete">삭제</button>
+        </div>
+    </div>
+    <!--/body-->
+
+<!--     <script th:src="@{/js/jquery.min.js}"></script> -->
+	<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script th:if="!${tuninfo?.id}">
+    $('#insert').click(function() {
+    	var jsonData = JSON.stringify({
+     		tunType : $('#tuninfo_tunType').val(),
+    		defType : $('#tuninfo_defType').val(),
+    		testType : $('#tuninfo_testType').val(),
+    		reviewer : $('#tuninfo_reviewer').val(),
+    		description : $('#tuninfo_description').val(),
+    		reviewedDate : $('#tuninfo_reviewedDate').val(),
+    		submitType : $('#tuninfo_submitType').val(),
+    		submittedDate : $('#tuninfo_submittedDate').val(),
+    		updateType : $('#tuninfo_updateType').val(),
+    		updatedDate : $('#tuninfo_updatedDate').val(),
+    		tuner : $('#tuninfo_tuner').val(),
+    		responsible : $('#tuninfo_responsible').val(),
+    		status : $('#tuninfo_status').val(),
+    		detailType : $('#tuninfo_detailType').val(),
+    		comment : $('#tuninfo_comment').val()
+    	});
+    	$.ajax({
+    		url: "http://localhost:8080/api/tuninfos",
+    		type: "POST",
+    		data: jsonData,
+    		contentType: "application/json",
+    		dataType: "json",
+    		success:function(data) {
+    			alert('저장 성공!');
+    			location.href = '/tuninfo/list';
+    		},
+    		error: function(jqXHR, textStatus, errorThrown) {
+     			alert('저장 실패!'+ '(' + jqXHR.status + '|' + jqXHR.statusText + ')');
+     			alert(jqXHR.responseText + '|' + jqXHR.readyState);
+
+    		}
+    	});
+    }); 
+    </script>
+    <script th:if="${tuninfo?.id}">
+	var now = new Date(); 
+    var datetime = now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+' '+now.getHours()+':'+now.getMinutes()+':'+now.getSeconds(); 
+
+    function text_add(str, startNum, endNum){ // 매개변수를 num으로 받는다.
+    	var total_ta = document.getElementById('tuninfo_comment');
+    	var t1 = document.getElementById('tuninfo_reviewedDate').value;
+    	var t2 = document.getElementById("tuninfo_reviewer").value; // 각각의 텍스트 textarea의 value 값을 지정
+    	var t3 = document.getElementById('tuninfo_description').value; // 각각의 텍스트 textarea의 value 값을 지정
+    	var t4 = document.getElementById('tuninfo_submittedDate').value;
+    	var t5 = document.getElementById('tuninfo_tuner').value; // 각각의 텍스트 textarea의 value 값을 지정
+    	var t6 = document.getElementById('tuninfo_submitType').value; // 각각의 텍스트 textarea의 value 값을 지정
+    	var t7 = document.getElementById('tuninfo_updatedDate').value;
+    	var t8 = document.getElementById('tuninfo_responsible').value; // 각각의 텍스트 textarea의 value 값을 지정
+    	var t9 = document.getElementById('tuninfo_updateType').value; // 각각의 텍스트 textarea의 value 값을 지정
+    	var t10 = document.getElementById('tuninfo_closedDate').value;
+    	var t11 = document.getElementById('tuninfo_closeType').value; // 각각의 텍스트 textarea의 value 값을 지정
+    	 
+    	//alert(eval('t'+num));
+    	// eval 함수 사용법검색 변수명중 t1~t4 로 주었다..t 는 고정이기에 eval로 문자 't'로 감싸고
+    	// num 값이 1~4까지 매개변수로 밑에 html코드 쪽에 지정해주었기때문에 더간단하다.
+   		total_ta.value = total_ta.value + str + '||';
+
+    	for (var i=startNum; i<=endNum; i++) {
+    		var adt = eval('t'+ i); //textarea에서 개행문자 제어법입니다.
+ 			adt += '||';
+    		total_ta.value += adt;
+    	}
+    
+    	total_ta.value += '\r\n';
+    }
+    
+    // 검토의견 변경 시 변경 사항(결함 상태 변경 NEW -> 오픈, 검토자/건토의견 자동 기입) 
+	$('#tuninfo_description').change(function() {
+		$('#tuninfo_reviewer').val("홍길동");
+		$('#tuninfo_reviewedDate').val(new Date().toISOString().substring(0,19));
+		text_add("검토의견",1,3);		
+	});
+
+    // 가이드 제공 여부 변경시 시 변경 사항(결함 상태 변경 UNDER_GUIDE->IN-PROGRESS -> , 튜너/가이드제공일 자동 기입) 
+	$('#tuninfo_submitType').change(function() {
+		if ($(this).val() == 'Y') {
+				$('#tuninfo_status').val("IN_PROGRESS");
+			    $('#tuninfo_tuner').val("홍깅동");
+				$('#tuninfo_submittedDate').val(new Date().toISOString().substring(0,19));
+				text_add("가이드제공여부", 4, 6);
+			}
+		else if ($(this).val() == 'N' ) {
+			$('#tuninfo_status').val("UNDER_GUIDE");
+		    $('#tuninfo_tuner').val(null);
+			$('#tuninfo_submittedDate').val(null);
+		}
+	});
+
+	// 가이드 반영여부 변경 시 시 변경 사항(결함 상태 변경 UNDER_GUIDE->IN-PROGRESS -> , 튜너/가이드제공일 자동 기입) 
+	$('#tuninfo_updatedType').change(function() {
+		if ($(this).val() == 'Y') {
+			$('#tuninfo_updatedDate').val(new Date().toISOString().substring(0,19));
+			$('#tuninfo_status').val("FIXED");
+			text_add("가이드반영여부", 7, 9);		
+		}
+		else if ($(this).val() == 'N') {
+			$('#tuninfo_updatedDate').val(null);
+			$('#tuninfo_status').val("IN_PROGRESS");
+		}
+	});
+
+	// 완료여부  변경 시 시 변경 사항(결함 상태 변경  CLOSED1) 
+	$('#tuninfo_closeType').change(function() {
+		if ($(this).val() == 'Y') {
+			$('#tuninfo_closedDate').val(new Date().toISOString().substring(0,19));
+			$('#tuninfo_status').val("CLOSED");
+			text_add("완료여부", 10, 11);
+		}
+		else if($(this).val() == 'N'){
+			$('#tuninfo_closedDate').val(null);
+			$('#tuninfo_status').val("FIXED");
+		}
+		else {
+			$('#tuninfo_closedDate').val(datetime);
+			$('#tuninfo_status').val("CLOSED1");
+		}
+	});
+
+	
+	// 조건부 성공유형  변경 시 시 변경 사항(결함 상태 변경  CLOSED1) 
+	$('#tuninfo_detailType').change(function() {
+		if ( $('#tuninfo_closeType').val() != '조건부') {
+			alert("완료여부가 조건부일때만  업에이트 가능합니다.");
+		}
+	});
+
+	
+	if ($('#tuninfo_defType').val() == '--유형--'){
+   		alert("결함유형을 입력하세요");    	
+   	}
+   	
+   	if ($('#tuninfo_testType').val() == '--유형--' ){
+   		alert("테스트유형을 입력하세요");
+   	}
+	    
+    $('#update').click(function() {
+    	var jsonData = JSON.stringify({
+     		tunType : $('#tuninfo_tunType').val(),
+    		defType : $('#tuninfo_defType').val(),
+    		testType : $('#tuninfo_testType').val(),
+    		reviewer : $('#tuninfo_reviewer').val(),
+    		description : $('#tuninfo_description').val(),
+    		reviewedDate : $('#tuninfo_reviewedDate').val(),
+    		submitType : $('#tuninfo_submitType').val(),
+    		submittedDate : $('#tuninfo_submittedDate').val(),
+    		updateType : $('#tuninfo_updateType').val(),
+    		updatedDate : $('#tuninfo_updatedDate').val(),
+    		tuner : $('#tuninfo_tuner').val(),
+    		responsible : $('#tuninfo_responsible').val(),
+    		status : $('#tuninfo_status').val(),
+    		closeType : $('#tuninfo_closeType').val(),
+    		detailType : $('#tuninfo_detailType').val(),
+    		comment : $('#tuninfo_comment').val()
+    	});
+		
+    	$.ajax({
+    		url: "http://localhost:8080/api/tuninfos/" + $('#tuninfo_id').val(),
+    		type: "PUT",
+    		data: jsonData,
+    		contentType: "application/json",
+    		dataType: "json",
+    		success:function(data) {
+    			alert('수정 성공!');
+    			location.href = '/tuninfo/list';
+    		},
+    		error: function(jqXHR, textStatus, errorThrown) {
+     			alert('수정 실패!'+ '(' + jqXHR.status + '|' + jqXHR.statusText + ')');
+     			alert(jqXHR.responseText + '|' + jqXHR.readyState);
+    		}
+    	});
+    });
+    $('#delete').click(function() {
+    	$.ajax({
+    		url: "http://localhost:8080/api/tuninfos/" + $('#tuninfo_id').val(),
+    		type: "DELETE",
+    		success:function() {
+    			alert('삭제 성공!');
+    			location.href = '/tuninfo/list';
+    		},
+    		error: function() {
+     			alert('삭제 실패!'+ '(' + jqXHR.status + '|' + jqXHR.statusText + ')');
+     			alert(jqXHR.responseText + '|' + jqXHR.readyState);
+    		}
+    	});
+    });   
+</script>
+
+	<!-- Footer HTML 로드 시작-->
+	<footer th:fragment="/common/footer.html"></footer>
+	<!-- Footer HTML 로드 종료-->
+		
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ 
+<mapper namespace="com.tuningboard.mapper.ServiceStatisticsMapper">
+ 
+    <select id="getServiceStatistics" resultType="com.tuningboard.domain.ServiceStatisticsDTO">
+        <![CDATA[SELECT  COALESCE(perf.type, 'Total') AS type,
+			COUNT(0) AS svc_count,
+			IFNULL(SUM((CASE WHEN ((perf.priority = 'MCP') AND (perf.RT = '8초이상')) THEN 1 ELSE 0 END)),0) AS 'mcp_8', 
+			IFNULL(SUM((CASE WHEN ((perf.priority = 'MCP') AND (perf.RT = '3-8초'))  THEN 1 ELSE 0 END)),0) AS 'mcp_3_8',
+			IFNULL(SUM((CASE WHEN ((perf.priority = 'MCP') AND (perf.RT = '3초이하')) THEN 1 ELSE 0 END)),0) AS 'mcp_3', 
+			IFNULL(ROUND(SUM((CASE WHEN ((perf.priority = 'MCP') AND (perf.RT = '3초이하')) THEN 1 ELSE 0 END))/SUM(CASE WHEN (perf.priority = 'MCP') THEN 1 ELSE 0 END)*100,0),0) AS 'mcp_Ratio', 
+			IFNULL(SUM((CASE WHEN ((perf.priority = 'CP')  AND (perf.RT = '8초이상')) THEN 1 ELSE 0 END)),0) AS 'cp_8',
+			IFNULL(SUM((CASE WHEN ((perf.priority = 'CP')  AND (perf.RT = '3-8초'))  THEN 1 ELSE 0 END)),0) AS 'cp_3_8',
+			IFNULL(SUM((CASE WHEN ((perf.priority = 'CP')  AND (perf.RT = '3초이하')) THEN 1 ELSE 0 END)),0) AS 'cp_3', 
+			IFNULL(ROUND(SUM((CASE WHEN ((perf.priority = 'CP') AND (perf.RT = '3초이하')) THEN 1 ELSE 0 END))/SUM(CASE WHEN (perf.priority = 'CP') THEN 1 ELSE 0 END)*100,0),0) AS 'cp_Ratio', 
+			IFNULL(SUM((CASE WHEN ((perf.priority = '기타') AND (perf.RT = '8초이상')) THEN 1 ELSE 0 END)),0) AS 'etc_8',
+			IFNULL(SUM((CASE WHEN ((perf.priority = '기타') AND (perf.RT = '3-8초'))  THEN 1 ELSE 0 END)),0) AS 'etc_3_8',
+			IFNULL(SUM((CASE WHEN ((perf.priority = '기타') AND (perf.RT = '3초이하')) THEN 1 ELSE 0 END)),0) AS 'etc_3', 
+			 IFNULL(ROUND(SUM((CASE WHEN ((perf.priority = '기타') AND (perf.RT = '3초이하')) THEN 1 ELSE 0 END))/SUM(CASE WHEN (perf.priority = '기타') THEN 1 ELSE 0 END)*100,0),0) AS 'etc_Ratio'
+				FROM 
+				(
+				SELECT  a.type AS type, 
+						a.priority AS priority, 
+						(CASE
+							WHEN (AVG(b.avgtime) > 8000) THEN '8초이상'
+							WHEN (AVG(b.avgtime) BETWEEN 3000 AND 8000) THEN '3-8초' 
+							WHEN (AVG(b.avgtime) < 3000) THEN '3초이하'
+						END) AS RT
+				FROM svcinfo a LEFT JOIN perfinfo b ON a.svcid = b.svcid
+				 	WHERE  b.cnt IS NOT NULL
+				 	]]>
+    			 	<if test="startdate != null and enddate != null">
+    			 	AND  B.createddate BETWEEN #{startdate,jdbcType=DATE} AND #{enddate,jdbcType=DATE}
+    			 	</if>
+    			 	<![CDATA[
+					GROUP BY type,priority) perf
+					GROUP BY perf.type WITH ROLLUP
+					ORDER BY perf.type DESC
+				]]>
+    </select> 
+</mapper>

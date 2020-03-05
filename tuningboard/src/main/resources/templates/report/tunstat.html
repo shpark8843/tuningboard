@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>성능 현황 통계</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+
+	<style>
+                #topMenu {
+                        height: 30px;
+                        width: 1500px;
+                }
+
+                #topMenu ul li {
+                        list-style: none;
+                        color: white;
+                        background-color: #2d2d2d;
+                        float: left;
+                        line-height: 30px;
+                        vertical-align: middle;
+                        text-align: center;
+                }
+
+                #topMenu .menuLink {
+                        text-decoration:none;
+                        color: white;
+                        display: block;
+                        width: 150px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        font-family: "Trebuchet MS";
+                }
+                #topMenu .menuLink:hover {
+                        color: red;
+                        background-color: #4d4d4d;
+                }
+                p{
+        			text-align: center;
+    			}
+	    </style> 
+
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+	/*<![CDATA[*/
+		$(document).ready(function() {
+		    google.charts.load('current', {'packages': ['corechart']});
+		    google.charts.setOnLoadCallback(function() {drawChart()});
+		    	
+		   	function drawChart() {
+	 	   		
+	 	   		var data_tun = new google.visualization.DataTable();
+		 	   	
+	 	   		// Declare columns
+		 	   	data_tun.addColumn('string', 'type');
+		 	    data_tun.addColumn('number', 'total');
+		 	   	data_tun.addColumn('number', 'open');
+		 	   	data_tun.addColumn('number', 'under_guide');
+		 	   	data_tun.addColumn('number', 'in_progress');
+		 	   	data_tun.addColumn('number', 'fixed');
+		 	   	data_tun.addColumn('number', 'reopen');
+		 	   	data_tun.addColumn('number', 'closed');
+		 	   	data_tun.addColumn('number', 'closed1');
+		 	   	data_tun.addColumn('number', 'total_closed');
+		 			   		
+ 		 	   	var tunArray = [];
+		 	   	$.each(/*[[${tunstatList}]]*/, function(i, obj) {
+		 	   		tunArray.push([obj.type, obj.total, obj.open, obj.under_guide, obj.in_progress, obj.fixed, obj.reopen, obj.closed, obj.closed1, obj.total_closed]);
+		 	   	});		 	   	
+		 	   	data_tun.addRows(tunArray);
+		   		
+		   		var chart_options = {
+		   				title: '성능 개선 현황',
+		   				width: 1000,
+		   				height : 500,
+		   				bar: {groupWidth: "95%"},
+		   		        legend: { position: "top" , maxLines: 3 }
+		   		};
+		   		
+		   		var barchart_tun = new google.visualization.ColumnChart(document.getElementById('barchart_tun'));
+		   		barchart_tun.draw(data_tun, chart_options);		   		
+		   		
+		   		// Defect_type
+				var data_defType = new google.visualization.DataTable();
+		 	   	
+	 	   		// Declare columns
+		 	   	data_defType.addColumn('string', 'deftype');
+		 	   	data_defType.addColumn('number', 'cnt');
+		 			   		
+		 	   	var defTypeArray = [];
+		 	   	$.each(/*[[${deftypeList}]]*/, function(i, obj) {
+		 	   		defTypeArray.push([obj.deftype, obj.cnt]);
+		 	   	});
+		   		
+		 	   	data_defType.addRows(defTypeArray);
+	 	   	
+		 	   	chart_options = {
+		   				title: '결함 유형  현황',
+		   				width: 500,
+		   				height : 500,
+		   				bar: {groupWidth: "95%"},
+		   		        legend: { position: "top", maxLines: 3 }
+		   			};
+		   		
+		 	   	var piechart_defType = new google.visualization.PieChart(document.getElementById('piechart_defType'));
+		   		piechart_defType.draw(data_defType, chart_options);		   		
+ 		   		} 
+		});
+	   	/*]]>*/
+	   	</script>		     
+</head>
+
+
+<body>
+    <!--header-->
+    <nav class="navbar navbar-default navbar-fixed-top" >
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div id="topMenu" >
+             <ul> 
+             	<li><a class="menuLink" href="/svcinfo/list">서비스 현황</a></li> 
+             	<li><a class="menuLink" href="/tuninfo/list">서비스 튜닝 현황</a></li> 
+             	<li><a class="menuLink" href="/report/svcstat">서비스 현황 통계</a></li> 
+             	<li><a class="menuLink" href="/report/tunstat">서비스 튜닝 통계</a></li> 
+             </ul>
+	        <ul class="pull-right" style="width:100px;margin:1px 0;">
+            	<li><a href="/logout" class="btn btn-primary btn-block">로그아웃</a></li>
+    	    </ul>     
+         	</div>
+         </div>
+    </nav>
+    <!--/header-->
+
+    <!--body-->
+    <div class="container">
+        <br/>
+        <div class="page-header">
+              <h2>서비스 튜닝 통계</h2>
+        </div>
+        
+        <div id="mainHide">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th class="col-lg-1"></th>
+                    <th class="col-lg-1">기본정보</th>
+                    <th class="col-lg-1"></th>
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1">개선현황</th>
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1">유형</th>
+                    <th class="col-lg-1"></th>                    
+                    <th class="col-lg-1"></th>                    
+                </tr>
+                </thead>
+                <thead>
+                <tr>
+                    <td class="col-lg-1">유형</td>
+                    <td class="col-lg-1">서비스수</td>
+                    <td class="col-lg-1">합계</td>
+                    <td class="col-lg-1">분석중</td>
+                    <td class="col-lg-1">가이드중</td>
+                    <td class="col-lg-1">개선중</td>
+                    <td class="col-lg-1">반영</td>
+                    <td class="col-lg-1">개선필요</td>
+                    <td class="col-lg-1">완료</td>
+                    <td class="col-lg-1">완료(조건부)</td>
+                    <td class="col-lg-1">완료(합계)</td>
+                    <td class="col-lg-1">%</td>
+                    <td class="col-lg-1">합계</td>
+                    <td class="col-lg-1">APP</td>
+                    <td class="col-lg-1">SQL</td>
+                    <td class="col-lg-1">APPSQL</td>
+                    <td class="col-lg-1">TMF</td>
+                    <td class="col-lg-1">I/F</td>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="tunstat : ${tunstatList}">
+                        <td th:text="${tunstat.type}"></td>
+                        <td th:text="${tunstat.svc_Count}"></td>
+                        <td th:text="${tunstat.total}"></td>
+                        <td th:text="${tunstat.open}"></td>
+                        <td th:text="${tunstat.under_Guide}"></td>
+                        <td th:text="${tunstat.in_progress}"></td>
+                        <td th:text="${tunstat.fixed}"></td>
+                        <td th:text="${tunstat.reopen}"></td>
+                        <td th:text="${tunstat.closed}"></td>
+                        <td th:text="${tunstat.closed1}"></td>
+                        <td th:text="${tunstat.total_closed}"></td>
+                        <td th:text="${tunstat.ratio}"></td>
+                        <td th:text="${tunstat.app}"></td>
+                        <td th:text="${tunstat.sql}"></td>
+                        <td th:text="${tunstat.sql}"></td>
+                        <td th:text="${tunstat.appsql}"></td>
+                        <td th:text="${tunstat.tmf}"></td>
+                        <td th:text="${tunstat.i_f}"></td>                                                
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+         <table class="table table-striped table-sm">
+		      <thead>
+		      <tr>
+		      <td id="barchart_tun" style="width: 800px; height: 500px;"></td>
+	 		  <td id="piechart_defType" style="width: 400px; height: 400px;"></td>
+			  </tr>
+		  	  </thead>
+		  </table>
+      </div>    
+	<!--/body-->
+
+	<!-- Footer HTML 로드 시작-->
+	<footer th:fragment="/common/footer.html"></footer>
+	<!-- Footer HTML 로드 종료-->
+</body>
+</html>

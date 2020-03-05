@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ 
+<mapper namespace="com.tuningboard.mapper.DefTypeStatisticsMapper">
+ 
+    <select id="getDefTypeStatistics" resultType="com.tuningboard.domain.DefTypeStatisticsDTO">
+        <![CDATA[ 
+		SELECT 	tuninfo.deftype AS 'deftype',
+        COUNT(0) AS 'cnt'
+		FROM tuninfo
+		GROUP BY tuninfo.deftype
+		]]>
+    </select> 
+</mapper>
